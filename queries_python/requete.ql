@@ -1,24 +1,14 @@
 import python
 
 /**
- * Cette requête détecte les injections SQL dans les requêtes Python.
+ * Cette requête extrait toutes les fonctions définies dans un code Python.
  */
-class SqlInjection extends python.SqlQuery {
-  SqlInjection() {
-    // Vérifie si une requête SQL est construite de manière vulnérable,
-    // par exemple, par la concaténation de chaînes de caractères provenant
-    // d'entrées non sécurisées.
-    exists(
-      string s1, string s2 |
-        this.getArguments() = [s1, s2] and
-        s1 instanceof python.Name and
-        s2 instanceof python.Name and
-        this.getName() = "execute" and
-        s1.getName() = "username" and
-        s2.getName() = "password"
-    )
+class FunctionDefinition extends python.Function {
+  FunctionDefinition() {
+    // La classe "Function" représente une fonction Python définie dans le code.
+    // Ici, nous laissons simplement la condition vide pour capturer toutes les fonctions.
   }
 }
 
-from SqlInjection i
-select i, "Potential SQL injection detected."
+from FunctionDefinition f
+select f.getName(), f.getDeclaringType(), f.getLocation()

@@ -2,9 +2,9 @@ name: CodeQL Analysis
 
 on:
   push:
-    branches: [main]
+    branches: [main]  # Le workflow s'exécute lors des pushs sur la branche principale
   pull_request:
-    branches: [main]
+    branches: [main]  # Le workflow s'exécute lors des pull requests vers la branche principale
 
 jobs:
   analyze:
@@ -12,19 +12,34 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    - name: Checkout CodeQL repository
-      run: git clone --branch main https://github.com/github/codeql.git
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'  # Définir la version de Python utilisée dans le projet
 
-    - name: Set up CodeQL
-      uses: github/codeql-action/init@v2
-      with:
-        languages: python
-        queries: ./codeql/python/ql/src/codeql-suites/python-code-scanning.qls
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt  # Installer les dépendances Python si nécessaire
 
-    - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v2
-      with:
-        category: python-analysis
+      - name: Checkout CodeQL repository
+        run: git clone --branch main https://github.com/github/codeql.git
+
+      - name: Set up CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: python
+          queries: ./codeql/python/ql/src/Security/CWE-094/CodeInjection.ql  # Spécifier la requête CodeQL pour détecter l'injection de code
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+        with:
+          category: python-analysis
+
+      - name: Upload CodeQL results to GitHub
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: results.sarif

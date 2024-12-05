@@ -1,7 +1,3 @@
-permissions:
-  contents: read # Permet de lire les fichiers du dépôt
-  security-events: write # Permet de publier des alertes de sécurité
-
 name: CodeQL Analysis
 
 on:
@@ -19,12 +15,16 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
+    - name: Checkout CodeQL repository
+      run: git clone --branch main https://github.com/github/codeql.git
+
     - name: Set up CodeQL
       uses: github/codeql-action/init@v2
       with:
         languages: python
+        queries: ./codeql/python/ql/src/codeql-suites/python-code-scanning.qls
 
-    - name: Run CodeQL analysis
+    - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v2
       with:
         category: python-analysis

@@ -1,3 +1,7 @@
+permissions:
+  contents: read # Permet de lire les fichiers du dépôt
+  security-events: write # Permet de publier des alertes de sécurité
+
 name: CodeQL Analysis
 
 on:
@@ -12,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
+    - name: Checkout repository
       uses: actions/checkout@v3
 
     - name: Set up CodeQL
@@ -20,5 +24,7 @@ jobs:
       with:
         languages: python
 
-    - name: Perform CodeQL Analysis
+    - name: Run CodeQL analysis
       uses: github/codeql-action/analyze@v2
+      with:
+        category: python-analysis
